@@ -1,0 +1,240 @@
+create database practice;
+use database practice;
+
+
+
+
+create table public.location(
+loc_id int primary key,
+Street_no int,
+vill_name varchar(40),
+city varchar(30),
+state varchar(25),
+country varchar(30)    
+);
+insert into public.location values(1,201,'kalyan','chennai','TN','India');  
+insert into public.location values(2,466,'pavan','vellore','TN','India');
+insert into public.location values(3,34,'nilas','ranipet','TN','India');
+insert into public.location values(4,237,'ramu','madurai','TN','India');
+insert into public.location values(5,587,'kali','hosur','TN','India');
+insert into public.location values(6,867,'bali','hosur','TN','India');
+insert into public.location values(7,337,'nivas','hyderbad','AP','India');
+insert into public.location values(8,760,'rupan','kadapa','AP','India');
+
+select * from public.location;
+
+create table public.jobs(
+job_id int primary key,
+job_title varchar(30)
+);
+
+insert into public.jobs values (11,'engineer');
+insert into public.jobs values (12,'plumber');
+insert into public.jobs values (13,'electrician');
+insert into public.jobs values (14,'carpenter');
+insert into public.jobs values (15,'driver');
+
+
+create table public.department(
+dept_id int primary key,
+dept_name varchar(30),
+loc_id int,
+dept_head varchar(30)
+);
+
+insert into public.department values (10001,'construction',3,'manu');
+
+insert into public.department values (10002,'manufacturing',1,'raman');
+
+insert into public.department values (10003,'finance',4,'prasad');
+
+insert into public.department values (10004,'assembly',2,'deepak');
+
+insert into public.department values (10005,'testing',5,'saran');
+
+
+insert into public.department values (10006,'IT',8,'bheem');
+
+insert into public.department values (10007,'HR',7,'raj');
+
+create table public.dependents(
+dept_id int primary key,
+dept_name varchar(50),
+relationship varchar(25),
+employee_id int
+);
+
+
+insert into public.dependents values (10001,'construction','father',101);
+
+insert into public.dependents values (10002,'manufacturing','mother',102);
+
+insert into public.dependents values (10003,'finance','sister',103);
+
+insert into public.dependents values (10004,'assembly','brother',104);
+
+insert into public.dependents values (10005,'testing','cousin',105);
+
+insert into public.dependents values (10006,'IT','cousin',105);
+insert into public.dependents values (10006,'HR','Null',102);
+
+
+create table public.employee(
+employee_id int primary key,
+emp_name varchar(30),
+dept_id int,
+joining_dt date,
+dob date,
+yrs_of_exp numeric,
+phone_numb int,
+marital_status boolean,
+job_id int,
+salary decimal(8,2),
+manager_id int
+);
+
+insert into employee values(101,'lokesh',10001,'12/10/2015','02/03/1990',10, 12345678,1,12,100000,100);
+insert into employee values(102,'arun',10002,'12/12/2014','09/14/1995',13,87654321,0,11,150000,120);
+insert into employee values(103,'raju',10003,'07/29/2013','06/26/1993',15, 12121212,1,14,170000,145);
+insert into employee values(104,'sankar',10004,'04/06/2008','01/31/1996',12, 34343434,1,15,180000,149);
+insert into employee values(105,'nivya',10005,'11/17/2017','11/05/1992',8, 78787878,0,13,200000,132);
+insert into employee values(107,'nivas',10002,'03/19/2016','09/17/1994',9, 8539478534,1,14,200000,132);
+select * from public.employee;
+truncate table public.employee;
+
+--Q2.1.1
+select e.employee_id,e.emp_name,p.dept_id,p.dept_name from public.employee e, public.department p where 
+e.dept_id =p.dept_id and e.dept_id is not null;
+
+--Q2.1.2
+select emp_name, salary from public.employee;
+
+
+--Q2.2.1
+select * from public.employee where salary <170000;
+--Q2.2.2
+select employee_id,emp_name from public.employee where joining_dt <'01/01/2015';
+
+--Q2.2.3
+select emp_name,salary,manager_id from employee where manager_id in (100, 120, 145, 149);
+
+--Q2.2.4
+select emp_name from employee where emp_name like 'r%';
+
+--Q2.2.5
+SELECT *
+FROM employee
+WHERE salary IN
+    (SELECT salary
+     FROM employee e
+     WHERE employee.employee_id <> e.employee_id);
+     
+
+--Q2.2.6
+select * from employee e ,dependents d where e.employee_id = d.employee_id and d.dept_name in ('finance', 'manufacturing','construction');
+
+--Q2.3.1
+select dept_name,count(*) from dependents d, employee e where d.employee_id=e.employee_id
+group by dept_name;
+
+--Q2.3.2
+select emp_name, dept_id from employee where dept_id in (20,50)
+order by emp_name asc;
+--Q2.3.3
+select emp_name,dept_id,dept_name from employee 
+order by emp_name;
+--Q2.3.4
+select emp_name,dept_id,yrs_of_exp from employee
+where MARITAL_STATUS =FALSE
+GROUP BY yrs_of_exp,emp_name,dept_id
+order by dept_id;
+
+--Q2.4.1
+select e.employee_id,e.emp_name,d.dept_name,l.state from employee e
+left join department d
+on e.DEPT_ID = d.DEPT_ID
+left join location l on d.loc_id = l.loc_id
+where l.state = 'TN';
+
+//Q2.4.2
+select e.emp_name, e.salary, ,j.job_title from employee e 
+right join jobs j
+on e.job_id = j.job_id;
+
+//Q2.4.3
+select count(e.employee_id) as number_of_employees, j.job_title from employee e 
+inner join jobs j
+on e.job_id = j.job_id
+group by j.job_title;
+
+//Q2.4.4
+select e.emp_name, d.dept_name, e.marital_status as Unmarried from employee e
+full join department d
+on E.DEPT_ID=D.DEPT_ID
+where e.marital_status = 'FALSE';
+
+
+
+
+
+
+--Q2.5.1
+select max(salary)-min(salary) as Difference
+from employee;
+
+--Q2.5.2
+select e.emp_name from employee e,dependents d where e.salary>(select avg(salary) from employee) and e.dept_id=d.dept_id and d.dept_name ='finance';
+
+--Q2.5.3
+select d.dept_name,max(e.salary),min (e.salary),avg(e.salary) from employee e, dependents d where e.dept_id=d.dept_id 
+group by d.dept_name;
+
+--2.6.1 
+SELECT SUBSTRING(emp_name, 1, 3 ) FROM employee;
+
+//2.6.2
+SELECT emp_name FROM employee
+WHERE emp_name LIKE '_____h';
+  
+//2.6.3
+Select EMP_name,DOB, getdate() as CurrentDate, year(getdate())-year(dob) as age from Employee;
+
+//2.6.4
+SELECT lower(emp_name), length(emp_name) as name_length FROM employee;
+//2.6.5
+select emp_name,getdate() as CurrentDate from employee;
+
+//2.6.6
+//alter table employee modify salary int;
+SELECT CEIL(SALARY) FROM EMPLOYEE;
+//2.6.7
+ 
+SELECT TO_CHAR(joining_dt, 'YYYY-MM-DD') FROM employee;
+
+
+--2.7.1 Index and view
+create or replace view chennai_employees(emp_name,phone_numb,manager_id) as
+select e.emp_name,e.phone_numb,e.manager_id from employee e
+left join department d
+on E.DEPT_ID=D.DEPT_ID
+left join location l on d.loc_id = l.loc_id
+where l.city = 'chennai';
+select * from chennai_employees;
+
+//2.7.2
+create index EMP_INDEX on employee (emp_name,dob,martial_status);
+
+--2.8.1 Sub Queries
+select * from employee
+where dept_id in (select dept_id from department
+                  where loc_id in (select loc_id from location
+                                    where loc_id not in (2546)));
+ 
+ //2.8.2
+select * from employee
+where salary >= (select avg(salary) from employee);
+
+//2.8.3
+select dept_name from department
+where dept_id in (select dept_id from employee
+                   where salary < 250000);
